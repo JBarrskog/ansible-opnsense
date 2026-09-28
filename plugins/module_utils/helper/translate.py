@@ -296,9 +296,13 @@ class SimplifyTranslate:
                 translated[field_ansible] = existing[field_api]
 
         # passthrough for fields that do not have to be translated and should not be "ignored"
+        # a translate KEY with a plain-string mapping was already set above from its API
+        # field; an API field that shares that key's literal name must not overwrite it
         translate_fields = self._fields_translate.values()
+        translate_keys_str = {k for k, v in self._fields_translate.items() if isinstance(v, str)}
         for field in existing:
-            if field not in translate_fields and field not in self._fields_ignore:
+            if field not in translate_fields and field not in translate_keys_str \
+                    and field not in self._fields_ignore:
                 translated[field] = existing[field]
 
         return translated
